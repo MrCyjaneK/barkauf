@@ -46,8 +46,8 @@ func fetchLnurlLink(link string) (lnurlPay, error) {
 		return lnurlPay{}, err
 	}
 	endpoint = strings.TrimSpace(endpoint)
-	if !strings.HasPrefix(strings.ToLower(endpoint), "https://") {
-		return lnurlPay{}, fmt.Errorf("Lightning link must use HTTPS")
+	if err := lightningURL(endpoint); err != nil {
+		return lnurlPay{}, err
 	}
 	body, err := getHTTPS(endpoint)
 	if err != nil {

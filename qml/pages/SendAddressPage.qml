@@ -24,14 +24,6 @@ Page {
         })
     }
 
-    function takeLnurlAmount() {
-        var parsed = SendParse.parse(dest.text)
-        if (!parsed.lnurl || !Wallet.lnurlReady || Wallet.lnurlTarget !== parsed.lnurl)
-            return
-        if (Wallet.lnurlFixed && Wallet.lnurlAmount > 0)
-            amountSat = Wallet.lnurlAmount
-    }
-
     function applyText(text) {
         text = String(text || "").replace(/^\s+|\s+$/g, "")
         if (!text.length)
@@ -41,8 +33,12 @@ Page {
         if (parsed.amountSat > 0)
             amountSat = parsed.amountSat
         if (parsed.lnurl && !(parsed.amountSat > 0)) {
-            Wallet.lookupLnurl(parsed.lnurl)
-            page.takeLnurlAmount()
+            var requested = parsed.lnurl
+            SendParse.resolveLnurl(requested, function (sats) {
+                if (SendParse.parse(dest.text).lnurl !== requested || !(sats > 0))
+                    return
+                page.amountSat = sats
+            })
         }
     }
 
@@ -53,11 +49,6 @@ Page {
                 page.applyText(text)
             })
         })
-    }
-
-    Connections {
-        target: Wallet
-        onChanged: page.takeLnurlAmount()
     }
 
     SilicaFlickable {

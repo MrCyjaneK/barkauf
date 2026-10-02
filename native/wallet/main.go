@@ -1765,11 +1765,11 @@ func (st *walletState) pay(raw string) (string, error) {
 	if parsed.lnurl != "" {
 		amount := parsed.amountSat
 		if !parsed.hasAmount || amount == 0 {
-			pay, err := fetchLnurlLink(parsed.lnurl)
+			details, err := fetchLnurlLink(parsed.lnurl)
 			if err != nil {
 				return "", err
 			}
-			sats, ok := fixedLnurlSats(pay)
+			sats, ok := fixedLnurlSats(details)
 			if !ok {
 				return "", fmt.Errorf("Lightning link has no amount")
 			}

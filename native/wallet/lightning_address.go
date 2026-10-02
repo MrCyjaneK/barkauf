@@ -106,12 +106,26 @@ func jsonMsat(n float64) (uint64, error) {
 	return uint64(n), nil
 }
 
+func lightningURL(raw string) error {
+	u, err := url.Parse(raw)
+	if err != nil || u.Host == "" {
+		return fmt.Errorf("Lightning lookup returned an invalid address")
+	}
+	if u.Scheme == "https" {
+		return nil
+	}
+	if u.Scheme == "http" && strings.HasSuffix(strings.ToLower(u.Hostname()), ".onion") {
+		return nil
+	}
+	return fmt.Errorf("Lightning lookup left HTTPS")
+}
+
 func getHTTPS(raw string) ([]byte, error) {
 	client := &http.Client{
 		Timeout: 15 * time.Second,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			if req.URL.Scheme != "https" {
-				return fmt.Errorf("Lightning lookup left HTTPS")
+			if err := lightningURL(req.URL.String()); err != nil {
+				return err
 			}
 			if len(via) >= 5 {
 				return fmt.Errorf("Lightning lookup redirected too many times")

@@ -11,6 +11,7 @@ Page {
     property var parsed: SendParse.parse(destination)
     property string chosen: ""
     property bool paying: false
+    property bool readingLnurl: false
     property bool waiting: false
     property string failure: ""
     property bool feePending: false
@@ -36,17 +37,17 @@ Page {
     function considerLnurl() {
         if (!parsed.lnurl)
             return
-        Wallet.lookupLnurl(parsed.lnurl)
-        page.takeLnurlAmount()
-    }
-
-    function takeLnurlAmount() {
-        if (!parsed.lnurl || !Wallet.lnurlReady || Wallet.lnurlTarget !== parsed.lnurl)
-            return
-        if (!(Wallet.lnurlFixed && Wallet.lnurlAmount > 0) || amountSat === Wallet.lnurlAmount)
-            return
-        amountSat = Wallet.lnurlAmount
-        page.scheduleFee()
+        var requested = parsed.lnurl
+        readingLnurl = !(amountSat > 0)
+        SendParse.resolveLnurl(requested, function (sats) {
+            if (page.parsed.lnurl !== requested)
+                return
+            page.readingLnurl = false
+            if (!(sats > 0) || page.amountSat === sats)
+                return
+            page.amountSat = sats
+            page.scheduleFee()
+        })
     }
 
     function payTo() {
@@ -226,8 +227,7 @@ Page {
 
     function extraDetail(name) {
         if (!methodOk(name)) {
-            if (name === "lightning" && parsed.lnurl && !(amountSat > 0)
-                    && Wallet.lnurlTarget === parsed.lnurl && !Wallet.lnurlReady)
+            if (name === "lightning" && parsed.lnurl && !(amountSat > 0) && page.readingLnurl)
                 return "Reading amount…"
             return "Not in this request"
         }
@@ -255,10 +255,7 @@ Page {
 
     Connections {
         target: Wallet
-        onChanged: {
-            page.takeLnurlAmount()
-            page.finishPay()
-        }
+        onChanged: page.finishPay()
         onBusyChanged: {
             if (Wallet.busy)
                 return

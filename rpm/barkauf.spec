@@ -7,7 +7,7 @@ Name:       barkauf
 
 Summary:    Barkauf mainnet wallet demo
 Version:    0.1
-Release:    36
+Release:    41
 Group:      Applications/System
 License:    BSD and MIT and Apache-2.0 and LGPLv2
 Source0:    %{name}-%{version}.tar.bz2

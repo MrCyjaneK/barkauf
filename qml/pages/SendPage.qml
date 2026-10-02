@@ -90,18 +90,15 @@ Page {
         applyParsed(SendParse.parse(Clipboard.text))
     }
 
-    function takeLnurlAmount() {
-        if (!destination || !Wallet.lnurlReady || Wallet.lnurlTarget !== destination)
-            return
-        if (Wallet.lnurlFixed && Wallet.lnurlAmount > 0)
-            showAmount(Wallet.lnurlAmount)
-    }
-
     function applyParsed(parsed) {
         if (parsed.lnurl && !(parsed.amountSat > 0)) {
-            destination = parsed.lnurl
-            Wallet.lookupLnurl(parsed.lnurl)
-            page.takeLnurlAmount()
+            var requested = parsed.lnurl
+            destination = requested
+            SendParse.resolveLnurl(requested, function (sats) {
+                if (page.destination !== requested || !(sats > 0))
+                    return
+                page.showAmount(sats)
+            })
             return
         }
         if (parsed.destination)
@@ -135,11 +132,6 @@ Page {
         if (rate > 0)
             return "≈ " + SendParse.formatMoney(amountSat, rate, Wallet.currency)
         return priceError
-    }
-
-    Connections {
-        target: Wallet
-        onChanged: page.takeLnurlAmount()
     }
 
     onStatusChanged: {

@@ -551,7 +551,7 @@ void WalletController::lookupLnurl(const QString &text)
     const QString link = text.trimmed();
     if (link.isEmpty())
         return;
-    if (link == m_lnurlTarget && m_lnurlReady)
+    if (link == m_lnurlTarget)
         return;
     m_lnurlTarget = link;
     m_lnurlReady = false;
@@ -640,13 +640,19 @@ void WalletController::apply(const QJsonObject &resp)
     m_lastOp = resp.value(QStringLiteral("op")).toString();
     const QString opError = resp.value(QStringLiteral("error")).toString();
     m_error = opError;
-    if (m_lastOp == QStringLiteral("lnurl") && resp.value(QStringLiteral("ok")).toBool()) {
-        const QString link = resp.value(QStringLiteral("lnurl")).toString();
-        if (link == m_lnurlTarget) {
-            m_lnurlReady = true;
-            m_lnurlFixed = resp.value(QStringLiteral("lnurl_fixed")).toBool();
-            m_lnurlAmount = resp.value(QStringLiteral("lnurl_amount")).toVariant().toULongLong();
+    if (m_lastOp == QStringLiteral("lnurl")) {
+        if (resp.value(QStringLiteral("ok")).toBool()) {
+            const QString link = resp.value(QStringLiteral("lnurl")).toString();
+            if (link == m_lnurlTarget) {
+                m_lnurlReady = true;
+                m_lnurlFixed = resp.value(QStringLiteral("lnurl_fixed")).toBool();
+                m_lnurlAmount = resp.value(QStringLiteral("lnurl_amount")).toVariant().toULongLong();
+            }
         }
+        // This reply is only the pay-link amount. The helper also echoes
+        // empty wallet fields, which must not clear the open wallet.
+        emit changed();
+        return;
     }
     if (resp.contains(QStringLiteral("has_wallet"))) {
         m_hasWallet = resp.value(QStringLiteral("has_wallet")).toBool();

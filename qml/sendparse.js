@@ -317,6 +317,153 @@ function loadBtcUsd(callback) {
     loadBtcFiat("USD", callback)
 }
 
+var bech32Charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
+var lnurlFixedCache = {}
+var lnurlWaiters = {}
+
+function bech32Polymod(values) {
+    var gen = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]
+    var chk = 1
+    for (var i = 0; i < values.length; i++) {
+        var top = chk >>> 25
+        chk = (((chk & 0x1ffffff) << 5) ^ values[i]) >>> 0
+        for (var j = 0; j < 5; j++) {
+            if ((top >>> j) & 1)
+                chk = (chk ^ gen[j]) >>> 0
+        }
+    }
+    return chk
+}
+
+function bech32HrpExpand(hrp) {
+    var out = []
+    for (var i = 0; i < hrp.length; i++)
+        out.push(hrp.charCodeAt(i) >> 5)
+    out.push(0)
+    for (var n = 0; n < hrp.length; n++)
+        out.push(hrp.charCodeAt(n) & 31)
+    return out
+}
+
+function convertBits(data, fromBits, toBits, pad) {
+    var acc = 0
+    var bits = 0
+    var maxv = (1 << toBits) - 1
+    var maxAcc = (1 << (fromBits + toBits - 1)) - 1
+    var out = []
+    for (var i = 0; i < data.length; i++) {
+        var value = data[i]
+        if ((value >> fromBits) !== 0)
+            return null
+        acc = ((acc << fromBits) | value) & maxAcc
+        bits += fromBits
+        while (bits >= toBits) {
+            bits -= toBits
+            out.push((acc >> bits) & maxv)
+        }
+    }
+    if (pad) {
+        if (bits > 0)
+            out.push((acc << (toBits - bits)) & maxv)
+    } else if (bits >= fromBits || ((acc << (toBits - bits)) & maxv) !== 0) {
+        return null
+    }
+    return out
+}
+
+function decodeLnurl(text) {
+    var s = lnurlValue(text)
+    if (!s)
+        return ""
+    s = s.toLowerCase()
+    var pos = s.lastIndexOf("1")
+    if (pos < 1 || pos + 7 > s.length)
+        return ""
+    var hrp = s.substring(0, pos)
+    var payload = s.substring(pos + 1)
+    var data = []
+    for (var i = 0; i < payload.length; i++) {
+        var n = bech32Charset.indexOf(payload.charAt(i))
+        if (n < 0)
+            return ""
+        data.push(n)
+    }
+    var mixed = bech32HrpExpand(hrp).concat(data)
+    if (bech32Polymod(mixed) !== 1 || hrp !== "lnurl")
+        return ""
+    var bytes = convertBits(data.slice(0, data.length - 6), 5, 8, false)
+    if (!bytes)
+        return ""
+    var url = ""
+    for (var b = 0; b < bytes.length; b++)
+        url += String.fromCharCode(bytes[b])
+    return url
+}
+
+function lnurlEndpointOk(url) {
+    var lower = String(url || "").toLowerCase()
+    if (lower.indexOf("https://") === 0)
+        return true
+    return lower.indexOf("http://") === 0 && /\.onion(\/|$)/.test(lower)
+}
+
+function fixedLnurlSats(body) {
+    var raw
+    try {
+        raw = JSON.parse(body)
+    } catch (e) {
+        return 0
+    }
+    if (!raw || raw.tag !== "payRequest")
+        return 0
+    var min = Number(raw.minSendable)
+    var max = Number(raw.maxSendable)
+    if (!(min > 0) || min !== max || min % 1000 !== 0)
+        return 0
+    return min / 1000
+}
+
+function finishLnurl(link, sats) {
+    if (sats > 0)
+        lnurlFixedCache[link] = sats
+    var waiters = lnurlWaiters[link] || []
+    delete lnurlWaiters[link]
+    for (var i = 0; i < waiters.length; i++)
+        waiters[i](sats > 0 ? sats : 0)
+}
+
+// The amount is not in the QR. A fixed LNURL-pay amount is the pay
+// request's minimum when it equals the maximum, in millisatoshis.
+function resolveLnurl(text, callback) {
+    var link = lnurlValue(text)
+    if (!link) {
+        callback(0)
+        return
+    }
+    if (Object.prototype.hasOwnProperty.call(lnurlFixedCache, link)) {
+        callback(lnurlFixedCache[link])
+        return
+    }
+    if (lnurlWaiters[link]) {
+        lnurlWaiters[link].push(callback)
+        return
+    }
+    lnurlWaiters[link] = [callback]
+    var endpoint = decodeLnurl(link)
+    if (!lnurlEndpointOk(endpoint)) {
+        finishLnurl(link, 0)
+        return
+    }
+    var xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== XMLHttpRequest.DONE)
+            return
+        finishLnurl(link, fixedLnurlSats(xhr.responseText))
+    }
+    xhr.open("GET", endpoint)
+    xhr.send()
+}
+
 function lnurlValue(text) {
     var s = String(text || "").replace(/^\s+|\s+$/g, "")
     if (s.toLowerCase().indexOf("lightning:") === 0)
