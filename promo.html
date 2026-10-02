@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barkauf</title>
+<style>
+  :root {
+    --bg: #03050a;
+    --ink: #f3f0e8;
+    --muted: #b7b1a6;
+    --faint: rgba(243, 240, 232, 0.42);
+    --blue: #9ec0ff;
+    --serif: "New York", "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+    --sans: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    background: var(--bg);
+    color: var(--ink);
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(ellipse 90% 42% at 50% 86%, rgba(186, 122, 64, 0.2), transparent 70%);
+  }
+
+  .slide {
+    --h: min(82dvh, 900px);
+    --phone: calc(var(--h) * 1032 / 2272);
+    position: relative;
+    z-index: 1;
+    height: 100dvh;
+    display: grid;
+    grid-template-columns: minmax(18rem, 1fr) var(--phone);
+    align-items: center;
+    column-gap: 4vw;
+    padding: 6vh 5.5vw;
+    overflow: hidden;
+  }
+
+  .slide.two {
+    --h: min(78dvh, 840px);
+    grid-template-columns: minmax(16rem, 1fr) var(--phone) var(--phone);
+    column-gap: 2.2vw;
+  }
+
+  .slide.manifesto {
+    grid-template-columns: 1fr;
+    align-items: center;
+  }
+
+  .n {
+    position: absolute;
+    top: 4.2vh;
+    left: 5.5vw;
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    color: var(--faint);
+  }
+
+  .copy {
+    align-self: center;
+    max-width: 36rem;
+  }
+
+  .manifesto .copy {
+    max-width: 46rem;
+  }
+
+  .kicker {
+    margin: 0 0 1.1rem;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--blue);
+  }
+
+  h1, h2, .quote {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+  }
+
+  h1 { font-size: clamp(52px, 5.2vw, 88px); }
+  h2 { font-size: clamp(44px, 4.2vw, 72px); }
+
+  .quote {
+    font-size: clamp(36px, 3.6vw, 64px);
+    line-height: 1.12;
+    max-width: 16em;
+  }
+
+  .sub {
+    margin: 1.35rem 0 0;
+    max-width: 28em;
+    font-size: clamp(18px, 1.45vw, 22px);
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  .mark {
+    font-size: 0.62em;
+    font-weight: 500;
+    line-height: 0;
+    position: relative;
+    top: -0.65em;
+    margin-left: 0.12em;
+    letter-spacing: 0;
+    color: var(--blue);
+  }
+
+  .gloss {
+    margin: 0.85rem 0 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1;
+    color: rgba(243, 240, 232, 0.72);
+  }
+
+  .gloss .mark {
+    font-family: var(--sans);
+    font-style: normal;
+    font-size: 0.7em;
+    top: -0.4em;
+    margin: 0 0.4em 0 0;
+  }
+
+  .rule {
+    width: 2.75rem;
+    height: 1px;
+    margin: 0 0 1.6rem;
+    border: 0;
+    background: var(--blue);
+  }
+
+  .rails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1.35rem;
+    margin: 2.4rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .colophon {
+    margin: 2.2rem 0 0;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--faint);
+  }
+
+  .hint {
+    position: absolute;
+    right: 5.5vw;
+    bottom: 4vh;
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .phone {
+    position: relative;
+    height: var(--h);
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid rgba(243, 240, 232, 0.16);
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.45);
+  }
+
+  .phone img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  ::selection {
+    background: #1a3f78;
+    color: white;
+  }
+
+  @media (max-height: 760px) {
+    h1 { font-size: 46px; }
+    h2 { font-size: 40px; }
+    .quote { font-size: 34px; }
+    .sub { font-size: 17px; }
+    .slide { --h: min(80dvh, 680px); }
+    .slide.two { --h: min(76dvh, 640px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section class="slide">
+    <p class="n">01</p>
+    <div class="copy">
+      <p class="kicker">Barkauf</p>
+      <h1>It’s all Bitcoin,<br>not only Bitcoin.</h1>
+      <p class="sub">Free money needs free<span class="mark">1</span> technology.</p>
+      <p class="gloss"><span class="mark">1</span>free as in beer</p>
+    </div>
+    <figure class="phone">
+      <img src="screenshots/10-cover-page.png" alt="Sailfish cover showing a Barkauf balance of 89 636 sats">
+    </figure>
+    <p class="hint"></p>
+  </section>
+
+  <section class="slide">
+    <p class="n">02</p>
+    <div class="copy">
+      <h2>On-chain, Ark, Lightning.</h2>
+      <p class="sub">Use what is available, and what's supported, broad compatibility means wider adoption.</p>
+    </div>
+    <figure class="phone">
+      <img src="screenshots/09-home-activity.png" alt="Home screen with the balance and a mixed activity list">
+    </figure>
+  </section>
+
+  <section class="slide">
+    <p class="n">03</p>
+    <div class="copy">
+      <h2>Built for SailfishOS.</h2>
+      <p class="sub">Free from anyone that could censor or ban it, runs on device that you own - together with it's software.</p>
+    </div>
+    <figure class="phone">
+      <img src="screenshots/04-pay-with-methods.png" alt="Pay with Ark selected, Lightning and on-chain listed below">
+    </figure>
+  </section>
+
+  <section class="slide two">
+    <p class="n">04</p>
+    <div class="copy">
+      <h2>Free from censorship.</h2>
+      <p class="sub">What would you do if Apple and Google banned all self-custodial wallets? It's important to have an alternative.</p>
+    </div>
+    <figure class="phone">
+      <img src="screenshots/05-receive-qr.png" alt="Receive screen with a QR code for 5 353 sats">
+    </figure>
+    <figure class="phone">
+      <img src="screenshots/06-vtxos.png" alt="VTXO list, six spendable notes">
+    </figure>
+  </section>
+
+  <section class="slide two">
+    <p class="n">05</p>
+    <div class="copy">
+      <h2>Stuck transactions.</h2>
+      <p class="sub">mempool.space bids the unconfirmed payment to mining pools. You pay their Lightning invoice.</p>
+    </div>
+    <figure class="phone">
+      <img src="screenshots/02-payment-details-quote-ready.png" alt="Payment details for an unconfirmed receive, with a mempool accelerator quote">
+    </figure>
+    <figure class="phone">
+      <img src="screenshots/03-accelerate-mempool.png" alt="Accelerate screen quoting mempool.space fees and mining pools">
+    </figure>
+  </section>
+
+  <section class="slide manifesto">
+    <p class="n">06</p>
+    <div class="copy">
+      <hr class="rule">
+      <p class="quote">In order to get an open financial system, we need to live in an open technological world.</p>
+      <p class="sub">It’s a statement. It’s an option. It’s an alternative. Built for open devices, running open software. For people fed up with the technological system.</p>
+      <ul class="rails">
+        <li>On-chain</li>
+        <li>Ark</li>
+        <li>Lightning</li>
+        <li>Scanning</li>
+        <li>NFC tap to pay</li>
+        <li>Notifications</li>
+        <li>VTXO refresh</li>
+        <li>Mempool accelerator</li>
+      </ul>
+      <p class="colophon">Bitcoin++, Berlin • October 2026</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

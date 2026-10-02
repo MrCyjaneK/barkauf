@@ -1,0 +1,4 @@
+github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e h1:MRM5ITcdelLK2j1vwZ3Je0FKVCfqOLp5zO6trqMLYs0=
+github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e/go.mod h1:XV66xRDqSt+GTGFMVlhk3ULuV0y9ZmzeVGR4mloJI3M=
+gitlab.com/ark-bitcoin/bark-ffi-bindings/golang v0.25.0 h1:cZ2Fj0mqeNf+gn+ssoqaHZO4QwoSUHC9F+NuhZg4rw4=
+gitlab.com/ark-bitcoin/bark-ffi-bindings/golang v0.25.0/go.mod h1:1jAwB/XR4i3D72fz3qWAd41tQLYcOCGfWZHMagn5fNg=

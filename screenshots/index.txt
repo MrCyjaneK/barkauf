@@ -1,0 +1,49 @@
+Barkone screenshots, captured 2026-10-02 around 12:16–12:20.
+Files are numbered in capture order.
+
+01-payment-details-quote-loading.png
+    Payment details for an unconfirmed on-chain receive of 11 111 sats
+    (about €8.52). Fee 306 sats. The mempool public accelerator card is
+    still loading: "Asking mempool for a quote…".
+
+02-payment-details-quote-ready.png
+    Same payment as 01, after the quote arrives. The accelerator card
+    now reads "From 76 000 sats". More details are still collapsed.
+
+03-accelerate-mempool.png
+    Accelerate screen for that transaction on mempool.space. Current fee
+    306 sats (2 sat/vB), size 153 vB, target 3 sat/vB, next-block fee
+    459 sats, service fee 75 000 sats. Pools listed: Poolin, BTC.com,
+    WhitePool, SBI Crypto +12. Explorer link and "Choose a bid".
+
+04-pay-with-methods.png
+    Pay with screen for 8 585 sats (€6.58). "The first available method
+    is selected." Ark is selected (recommended, no fee), with Lightning
+    and on-chain alternatives. Button: "Pay with Ark".
+
+05-receive-qr.png
+    Receive screen. QR for 5 353 sats (about €4.11), with "Change amount".
+    Subtitle: show the code, or copy one payment method.
+
+06-vtxos.png
+    VTXOs list, filter All. Six spendable notes:
+    12 143, 1 879, 1 878, and 527 sats at block 973589;
+    50 000 sats at block 973592;
+    2 335 sats at block 973594.
+
+07-accelerate-mempool-repeat.png
+    Second capture of the same Accelerate screen as 03. Same transaction,
+    fees, and pools. Pixel difference is noise only.
+
+08-payment-details-expanded.png
+    Same unconfirmed 11 111 sat receive as 01–02, with More details open.
+    Shows payment id (onchain-wallet-…), transaction id, and the
+    mempool.space explorer link. Accelerator quote still "From 76 000 sats".
+
+09-home-activity.png
+    Home (Barkauf). Balance 89 636 sats (€68.75), with 11 111 sats pending.
+    Activity mixes on-chain, Ark, and Lightning sends and receives from
+    1–2 Oct, including the unconfirmed +11 111 sat on-chain receive.
+
+10-cover-page.png
+    Cover page screenshot showing wallpaper and the app cover with balance

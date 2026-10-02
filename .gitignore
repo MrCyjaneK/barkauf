@@ -1,0 +1,14 @@
+/rpms/
+*.pro.user
+build-*
+*.o
+moc_*
+Makefile
+.gocache
+.gopath
+native/wallet/barkauf-wallet
+*.list
+.DS_Store
+.qmake.cache
+*.moc
+barkauf

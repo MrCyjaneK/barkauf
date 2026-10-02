@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Name=Barkauf
+Icon=barkauf
+Exec=barkauf
+
+[X-Sailjail]
+Permissions=Internet;Camera;NFC
+OrganizationName=barkauf
+ApplicationName=barkauf
